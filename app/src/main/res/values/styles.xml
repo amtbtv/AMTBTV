@@ -1,0 +1,33 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="@style/Theme.Leanback">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="DefaultCardTheme" parent="Theme.Leanback">
+        <item name="imageCardViewStyle">@style/DefaultCardStyle</item>
+        <item name="imageCardViewImageStyle">@style/DefaultCardImageStyle</item>
+    </style>
+
+    <style name="DefaultCardStyle" parent="Widget.Leanback.ImageCardViewStyle">
+        <item name="cardBackground">@null</item>
+    </style>
+
+    <style name="DefaultCardImageStyle" parent="Widget.Leanback.ImageCardView.ImageStyle">
+        <item name="android:layout_width">@dimen/default_image_card_width</item>
+        <item name="android:layout_height">@dimen/default_image_card_height</item>
+    </style>
+
+    <style name="TextCardStyle" parent="Widget.Leanback.BaseCardViewStyle">
+        <item name="cardBackground">@null</item>
+        <item name="android:layout_width">@dimen/default_text_card_width</item>
+        <item name="android:layout_height">@dimen/default_text_card_height</item>
+    </style>
+
+    <dimen name="default_image_card_width">133dp</dimen>
+    <dimen name="default_image_card_height">131dp</dimen>
+
+    <dimen name="default_text_card_width">133dp</dimen>
+    <dimen name="default_text_card_height">48dp</dimen>
+</resources>

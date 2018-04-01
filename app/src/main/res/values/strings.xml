@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">儒释道</string>
+    <string name="amtb_tv_title">儒释道网络电视台</string>
+    <string name="text_card_image_des">图像</string>
+    <string name="play_msg_default">节目名 频道名</string>
+</resources>
