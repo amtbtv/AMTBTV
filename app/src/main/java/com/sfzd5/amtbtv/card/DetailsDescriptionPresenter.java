@@ -35,7 +35,9 @@ public class DetailsDescriptionPresenter extends Presenter {
         primaryText.setText(card.name);
         sndText1.setText(card.recDate);
         sndText2.setText(card.recAddress);
-        extraText.setText(card.explain);
+
+        extraText.setText("共 "+String.valueOf(card.recCount)+" 集");
+
     }
 
     @Override public void onUnbindViewHolder(ViewHolder viewHolder) {

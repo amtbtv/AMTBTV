@@ -8,8 +8,8 @@ android {
         applicationId "com.sfzd5.amtbtv"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 5
-        versionName '1.0.5'
+        versionCode 6
+        versionName '1.0.6'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

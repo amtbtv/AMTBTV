@@ -27,6 +27,7 @@ public class PlayActivity extends Activity {
 
     public static final String TAG = "PlayActivity";
 
+
     List<Live> lives = null;
     int idx = 0;
 
