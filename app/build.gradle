@@ -36,4 +36,5 @@ dependencies {
     implementation 'com.android.support:leanback-v17:26.1.0'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.alibaba:fastjson:1.2.46'
+    implementation 'com.thoughtworks.xstream:xstream:1.4.10-java7'
 }
