@@ -62,5 +62,5 @@
         android:layout_width="match_parent"
         android:fontFamily="sans-serif-regular"
         android:layout_height="wrap_content"
-        android:text="Filmmaker Guillermo del Toro teas up with Legendary Pictures to bring audiences a unique take on the monster film with this sci/fi production."/>
+        android:text="Daital"/>
 </LinearLayout>

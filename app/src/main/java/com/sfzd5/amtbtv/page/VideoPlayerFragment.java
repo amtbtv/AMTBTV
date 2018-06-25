@@ -1,6 +1,7 @@
 package com.sfzd5.amtbtv.page;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +30,7 @@ public class VideoPlayerFragment  extends VideoFragment {
     History history;
     Handler handler;
 
-    private static String URL = "http://amtbsg.cloudapp.net/redirect/media/mp4/02/02-041/02-041-0001.mp4";
+    private static String URL = "";
     public static final String TAG = "VideoConsumption";
     private VideoMediaPlayerGlue<MediaPlayerAdapter> mMediaPlayerGlue;
     final VideoFragmentGlueHost mHost = new VideoFragmentGlueHost(this);
@@ -75,19 +76,13 @@ public class VideoPlayerFragment  extends VideoFragment {
 
         handler = new Handler();
         app = TVApplication.getInstance();
-        //查找pgogram
-        for (Channel c : app.data.channels) {
-            if (c.name.equals(app.curChannel)) {
-                for (Program p : c.programs) {
-                    if (p.id == app.curCardId) {
-                        program = p;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        idx = app.curFileIdx;
+
+        Intent intent = getActivity().getIntent();
+        String channel = intent.getStringExtra("channel");
+        String identifier = intent.getStringExtra("identifier");
+        idx = intent.getIntExtra("curFileIdx", 0);
+        program = app.findProgram(channel, identifier);
+
         if (program != null) {
 
             //记录历史记录
@@ -95,7 +90,7 @@ public class VideoPlayerFragment  extends VideoFragment {
             if(history==null){
                 history = new History();
                 history.channel = program.channel;
-                history.id = program.id;
+                history.identifier = program.identifier;
                 history.fileIdx = idx;
                 history.currentPosition = 0;
                 app.historyManager.historyList.add(0, history);
@@ -149,7 +144,6 @@ public class VideoPlayerFragment  extends VideoFragment {
                 idx++;
         }
         String file = program.files.get(idx);
-        app.curFileIdx = idx;
         return file;
     }
 

@@ -43,12 +43,16 @@ public class CacheOKHttp {
                 .build();
     }
 
+    public void asyncTakeFile(String filename, final CacheResult fileCacheResult, final boolean isTxt)
+    {
+        asyncTakeFile(filename, fileCacheResult, isTxt, "http://amtb.sfzd5.com/pic/");
+    }
     /**
      * 将下载并图片存入文件缓存
      */
-    public void asyncTakeFile(String filename, final CacheResult fileCacheResult, final boolean isTxt)
+    public void asyncTakeFile(String filename, final CacheResult fileCacheResult, final boolean isTxt, String baseUrl)
     {
-        String url = "http://amtb.sfzd5.com/pic/" + filename;
+        String url = baseUrl + filename;
         Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {
             @Override

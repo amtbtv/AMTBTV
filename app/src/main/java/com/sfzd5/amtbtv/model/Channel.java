@@ -4,6 +4,5 @@ import java.util.List;
 
 public class Channel {
     public String name;
-    public int sort;
     public List<Program> programs;
 }

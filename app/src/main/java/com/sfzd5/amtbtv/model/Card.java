@@ -1,13 +1,28 @@
 package com.sfzd5.amtbtv.model;
 
 public class Card {
-    public int id;
     public String channel;
     public String name;
     //120*131
-    public String cardPic;
+    private String cardPic;
     //600*350
-    public String bgPic;
+    private String bgPic;
+
+    public String getCardPic() {
+        return cardPic;
+    }
+
+    public void setCardPic(String cardPic) {
+        this.cardPic = cardPic;
+    }
+
+    public String getBgPic() {
+        return bgPic;
+    }
+
+    public void setBgPic(String bgPic) {
+        this.bgPic = bgPic;
+    }
 
     public int currentPosition = 0;
 }

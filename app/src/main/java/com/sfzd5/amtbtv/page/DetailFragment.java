@@ -24,7 +24,6 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.sfzd5.amtbtv.R;
 import com.sfzd5.amtbtv.TVApplication;
@@ -58,36 +57,28 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
 
     Handler handler;
     TVApplication app;
+    private Program program;
+    int curFileIdx = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         handler = new Handler();
         app = TVApplication.getInstance();
+
+        Intent intent = getActivity().getIntent();
+        String channel = intent.getStringExtra("channel");
+        String identifier = intent.getStringExtra("identifier");
+        program = app.findProgram(channel, identifier);
+
         setupUi();
         setupEventListeners();
     }
 
     private void setupUi() {
-        // Load the card we want to display from a JSON resource. This JSON data could come from
-        // anywhere in a real world app, e.g. a server.
-        Program data = null;
-        for(Channel c : app.data.channels){
-            if(c.name.equals(app.curChannel)){
-                for(Program p : c.programs){
-                    if(p.id == app.curCardId){
-                        data = p;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        if(data==null){
-            return;
-        }
-
         // Setup fragment
-        setTitle(data.name);
+        setTitle(program.name);
 
         FullWidthDetailsOverviewRowPresenter rowPresenter = new FullWidthDetailsOverviewRowPresenter(
                 new DetailsDescriptionPresenter(getActivity())) {
@@ -122,26 +113,25 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
         mRowsAdapter = new ArrayObjectAdapter(rowPresenterSelector);
 
         // Setup action and detail row.
-        detailsOverview = new DetailsOverviewRow(data);
+        detailsOverview = new DetailsOverviewRow(program);
         Drawable drawable = getResources().getDrawable(R.drawable.cardbg2);
         detailsOverview.setImageDrawable(drawable);
 
         ArrayObjectAdapter actionAdapter = new ArrayObjectAdapter();
 
-        app.curFileIdx=0;
-        String fileName = data.files.get(0);
+        String fileName = program.files.get(0);
         //查看是否存在播放记录
-        History history = app.historyManager.findProgramHistory(data);
+        History history = app.historyManager.findProgramHistory(program);
         if(history!=null) {
-            fileName = data.files.get(history.fileIdx);
-            app.curFileIdx = history.fileIdx;
+            fileName = program.files.get(history.fileIdx);
+            curFileIdx = history.fileIdx;
         }
 
-        mActionPlay = new Action(ACTION_PLAY, "播放"+fileName);
+        mActionPlay = new Action(ACTION_PLAY, getString(R.string.bofang)+fileName);
         actionAdapter.add(mActionPlay);
 
-        if(data.files.size()>1) {
-            mActionSelectMovie = new Action(ACTION_SELECT_MOVIE, "选集");
+        if(program.files.size()>1) {
+            mActionSelectMovie = new Action(ACTION_SELECT_MOVIE, getString(R.string.xuanji));
             actionAdapter.add(mActionSelectMovie);
         }
 
@@ -156,36 +146,34 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
             }
         }, 500);
 
-        app.http.asyncTakeFile(data.cardPic, new CacheResult() {
-            @Override
-            public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        detailsOverview.setImageDrawable(new BitmapDrawable(bmp));
-                    }
-                });
-            }
-        }, false);
-        app.http.asyncTakeFile(data.bgPic, new CacheResult() {
-            @Override
-            public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDetailsBackground.enableParallax();
-                        mDetailsBackground.setCoverBitmap(bmp);
-                    }
-                });
-            }
-        }, false);
-
-        //initializeBackground(data);
-    }
-
-    private void initializeBackground(Program data) {
+        detailsOverview.setImageDrawable(getResources().getDrawable(R.drawable.cardbg2));
         mDetailsBackground.enableParallax();
-        mDetailsBackground.setCoverBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.bg));
+        mDetailsBackground.setCoverBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.cardbg));
+        if(program.picCreated==1){
+            app.http.asyncTakeFile(program.getCardPic(), new CacheResult() {
+                @Override
+                public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            detailsOverview.setImageDrawable(new BitmapDrawable(bmp));
+                        }
+                    });
+                }
+            }, false);
+            app.http.asyncTakeFile(program.getBgPic(), new CacheResult() {
+                @Override
+                public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDetailsBackground.setCoverBitmap(bmp);
+                        }
+                    });
+                }
+            }, false);
+        }
+        //initializeBackground(data);
     }
 
     private void setupEventListeners() {
@@ -201,9 +189,15 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
 
         if (action.getId() == ACTION_PLAY) {
             Intent intent = new Intent(getActivity().getBaseContext(), VideoPlayerActivity.class);
+            intent.putExtra("channel", program.channel);
+            intent.putExtra("identifier", program.identifier);
+            intent.putExtra("curFileIdx", curFileIdx);
             startActivity(intent);
         } else if (action.getId() == ACTION_SELECT_MOVIE) {
             Intent intent = new Intent(getActivity().getBaseContext(), SelectMovieActivity.class);
+            intent.putExtra("channel", program.channel);
+            intent.putExtra("identifier", program.identifier);
+            intent.putExtra("curFileIdx", curFileIdx);
             startActivity(intent);
         }
     }

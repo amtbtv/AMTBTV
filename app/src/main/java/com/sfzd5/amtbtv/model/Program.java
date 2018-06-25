@@ -7,7 +7,16 @@ public class Program extends Card {
     public String identifier;
     public String recDate;
     public String recAddress;
-    public String explain;
-    public int recCount;
+    public int picCreated;
     public List<String> files;
+
+    @Override
+    public String getCardPic() {
+        return identifier + "_card.jpg";
+    }
+
+    @Override
+    public String getBgPic() {
+        return identifier + "_bg.jpg";
+    }
 }

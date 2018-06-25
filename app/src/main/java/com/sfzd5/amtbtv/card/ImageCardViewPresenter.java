@@ -10,6 +10,7 @@ import android.view.ContextThemeWrapper;
 import com.sfzd5.amtbtv.R;
 import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.model.Card;
+import com.sfzd5.amtbtv.model.Program;
 import com.sfzd5.amtbtv.util.CacheResult;
 
 
@@ -49,19 +50,28 @@ public class ImageCardViewPresenter extends AbstractCardPresenter<ImageCardView>
     public void onBindViewHolder(Card card, final ImageCardView cardView) {
         cardView.setTag(card);
         cardView.setTitleText(card.name);
-        //cardView.setContentText(card.getDescription());
-        app.http.asyncTakeFile(card.cardPic, new CacheResult() {
-            @Override
-            public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
-                if(bmp!=null){
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            cardView.setMainImage(new BitmapDrawable(bmp));
-                        }
-                    });
-                }
+        boolean bset = false;
+        cardView.setMainImage(getContext().getResources().getDrawable(R.drawable.cardbg2));
+        if(card instanceof Program){
+            Program program = (Program) card;
+            if(program.picCreated==0){
+                bset = true;
             }
-        }, false);
+        }
+        if(!bset) {
+            app.http.asyncTakeFile(card.getCardPic(), new CacheResult() {
+                @Override
+                public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
+                    if (bmp != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                cardView.setMainImage(new BitmapDrawable(bmp));
+                            }
+                        });
+                    }
+                }
+            }, false);
+        }
     }
 }

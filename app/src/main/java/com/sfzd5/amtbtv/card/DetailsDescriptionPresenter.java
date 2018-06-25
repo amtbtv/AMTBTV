@@ -36,7 +36,7 @@ public class DetailsDescriptionPresenter extends Presenter {
         sndText1.setText(card.recDate);
         sndText2.setText(card.recAddress);
 
-        extraText.setText("共 "+String.valueOf(card.recCount)+" 集");
+        extraText.setText(String.format(mContext.getString(R.string.detail_format), card.files.size()));
 
     }
 

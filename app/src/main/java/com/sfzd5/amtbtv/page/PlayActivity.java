@@ -9,24 +9,18 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.sfzd5.amtbtv.model.Card;
-import com.sfzd5.amtbtv.model.CardRow;
 import com.sfzd5.amtbtv.R;
 import com.sfzd5.amtbtv.TVApplication;
-import com.sfzd5.amtbtv.model.Channel;
 import com.sfzd5.amtbtv.model.Live;
-import com.sfzd5.amtbtv.model.Program;
 
 import java.util.List;
 
 public class PlayActivity extends Activity {
 
     public static final String TAG = "PlayActivity";
-
 
     List<Live> lives = null;
     int idx = 0;
@@ -43,6 +37,8 @@ public class PlayActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
+
+        String name = getIntent().getStringExtra("name");
 
         app = (TVApplication) getApplication();
         lives = app.data.lives;
@@ -76,7 +72,7 @@ public class PlayActivity extends Activity {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                 //视频播放出错
-                showMsg("视频播放出错");
+                showMsg(getString(R.string.video_play_err));
                 return false;
             }
         });
@@ -95,7 +91,7 @@ public class PlayActivity extends Activity {
             public boolean onInfo(MediaPlayer mediaPlayer, int what, int extra) {
                 //信息
                 if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-                    showMsg("正在缓冲");
+                    showMsg(getString(R.string.buffer));
                 }
                 return false;
             }
@@ -103,7 +99,7 @@ public class PlayActivity extends Activity {
 
         for (int i = 0; i < lives.size(); i++) {
             Live live = lives.get(i);
-            if (live.id == app.curCardId) {
+            if (live.name.equals(name)) {
                 idx = i;
                 break;
             }
@@ -143,7 +139,6 @@ public class PlayActivity extends Activity {
                 idx++;
         }
         Live live = lives.get(idx);
-        app.curCardId = live.id;
         return live;
     }
 

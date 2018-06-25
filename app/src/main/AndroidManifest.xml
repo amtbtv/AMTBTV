@@ -8,8 +8,6 @@
         android:targetSdkVersion="23"
         tools:overrideLibrary="android.support.media.tv" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -20,9 +18,12 @@
         android:name="android.software.leanback"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 <!--
     android:banner="@mipmap/app_banner"
     android:icon="@mipmap/ic_launcher"
@@ -54,7 +55,6 @@
         <activity android:name=".page.DetailActivity" />
         <activity android:name=".page.SelectMovieActivity" />
         <activity android:name=".page.VideoPlayerActivity" />
-        <activity android:name=".page.SearchActivity"></activity>
     </application>
 
 </manifest>

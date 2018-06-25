@@ -20,7 +20,7 @@ import android.support.v17.leanback.widget.VerticalGridPresenter;
 import android.view.View;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import com.sfzd5.amtbtv.R;
 import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.card.CardPresenterSelector;
@@ -56,6 +56,7 @@ public class MainFragment extends BrowseFragment {
         mBackgroundManager.attach(getActivity().getWindow());
         getMainFragmentRegistry().registerFragment(PageRow.class,
                 new PageRowFragmentFactory(mBackgroundManager));
+
     }
 
     private void setupUi() {
@@ -66,17 +67,6 @@ public class MainFragment extends BrowseFragment {
         //设置标题
         setTitle(getString(R.string.amtb_tv_title));
 
-        //搜索，打开搜索页
-        setOnSearchClickedListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), "该功能暂未完成",
-                        Toast.LENGTH_LONG).show();
-                //Intent intent = new Intent(getActivity().getBaseContext(), SearchActivity.class);
-                //startActivity(intent);
-            }
-        });
         prepareEntranceTransition();
     }
 
@@ -85,11 +75,11 @@ public class MainFragment extends BrowseFragment {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setAdapter(mRowsAdapter);
 
-        app.http.asyncTakeFile("program.txt", new CacheResult() {
+        app.http.asyncTakeFile("tvprogram.txt", new CacheResult() {
             @Override
             public void tackFile(String txt, Bitmap bmp, boolean isTxt) {
                 if(txt!=null){
-                    app.data = JSON.parseObject(txt, JsonResult.class);
+                    app.data = new Gson().fromJson(txt, JsonResult.class);
 
                     handler.post(new Runnable() {
                         @Override
@@ -100,7 +90,7 @@ public class MainFragment extends BrowseFragment {
                     });
                 }
             }
-        }, true);
+        }, true, "http://amtb.sfzd5.com/");
     }
 
     private void createRows() {
@@ -109,14 +99,14 @@ public class MainFragment extends BrowseFragment {
         int id = -1;
         //检测是否存在播放记录，若存在则加入播放记录
         if(app.historyManager.historyList.size()>0){
-            HeaderItem headerItem = new HeaderItem(id, "播放历史");
+            HeaderItem headerItem = new HeaderItem(id, getString(R.string.history));
             PageRow pageRow = new PageRow(headerItem);
             mRowsAdapter.add(pageRow);
         }
 
         //直播节目
         id++;
-        HeaderItem headerItem1 = new HeaderItem(id, "直播");
+        HeaderItem headerItem1 = new HeaderItem(id, getString(R.string.live));
         PageRow pageRow1 = new PageRow(headerItem1);
         mRowsAdapter.add(pageRow1);
 
@@ -187,20 +177,20 @@ public class MainFragment extends BrowseFragment {
                         Object item,
                         RowPresenter.ViewHolder rowViewHolder,
                         Row row) {
-
                     Card card = (Card) item;
-                    TVApplication app = TVApplication.getInstance();
-                    app.curChannel = card.channel;
-                    app.curCardId = card.id;
-
                     if(item instanceof Program){
+                        Program program = (Program) card;
                         Intent intent = new Intent(getActivity().getBaseContext(), DetailActivity.class);
+                        intent.putExtra("channel", program.channel);
+                        intent.putExtra("identifier", program.identifier);
                         startActivity(intent);
                     } else if(item instanceof Live){
+                        Live live = (Live) card;
                         Intent intent = new Intent(getActivity().getBaseContext(), PlayActivity.class);
+                        intent.putExtra("name", live.name);
                         startActivity(intent);
                     } else {
-                        Toast.makeText(getActivity(),"未知 "+card.name, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(),getString(R.string.unknow)+card.name, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -211,20 +201,10 @@ public class MainFragment extends BrowseFragment {
             if(id==-1){//历史
                 List<Card> cards = new ArrayList<>();
                 for(History history : app.historyManager.historyList){
-                    /*
-                    if(history.channel.equals("直播")){
-                        for(Live live : app.data.lives){
-                            if(live.id == history.id) {
-                                live.currentPosition = history.currentPosition;
-                                cards.add(live);
-                                break;
-                            }
-                        }
-                    } else { */
                         for(Channel channel : app.data.channels){
                             if(channel.name.equals(history.channel)){
                                 for(Program p : channel.programs){
-                                    if(p.id == history.id){
+                                    if(p.identifier.equals(history.identifier)){
                                         p.currentPosition = history.currentPosition;
                                         cards.add(p);
                                         break;

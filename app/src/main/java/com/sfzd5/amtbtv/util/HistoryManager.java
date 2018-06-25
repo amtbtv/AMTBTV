@@ -3,7 +3,8 @@ package com.sfzd5.amtbtv.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sfzd5.amtbtv.model.History;
 import com.sfzd5.amtbtv.model.Program;
 
@@ -23,13 +24,13 @@ public class HistoryManager {
         if(json.isEmpty()){
             historyList = new ArrayList<>();
         } else {
-            historyList = JSON.parseArray(json, History.class);
+            historyList = new Gson().fromJson(json, new TypeToken<List<History>>(){}.getType());
         }
     }
 
     public History findProgramHistory(Program program){
         for(History history : historyList){
-            if(history.channel.equals(program.channel) && history.id == program.id)
+            if(history.channel.equals(program.channel) && history.identifier.equals(program.identifier))
                 return history;
         }
         return null;
@@ -37,7 +38,7 @@ public class HistoryManager {
 
     public void save(){
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString("historyList", JSON.toJSONString(historyList));
+        editor.putString("historyList", new Gson().toJson(historyList));
         editor.commit();
     }
 }

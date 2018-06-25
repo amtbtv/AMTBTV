@@ -1,6 +1,14 @@
 <resources>
-    <string name="app_name">儒释道</string>
-    <string name="amtb_tv_title">儒释道网络电视台</string>
-    <string name="text_card_image_des">图像</string>
-    <string name="play_msg_default">节目名 频道名</string>
+    <string name="app_name">儒釋道</string>
+    <string name="amtb_tv_title">儒釋道網絡電視臺</string>
+    <string name="text_card_image_des">圖像</string>
+    <string name="play_msg_default">節目名 頻道名</string>
+    <string name="detail_format">共 %d 集</string>
+    <string name="bofang">播放</string>
+    <string name="xuanji">選集</string>
+    <string name="buffer">正在緩沖</string>
+    <string name="video_play_err">視頻播放出錯</string>
+    <string name="history">播放歷史</string>
+    <string name="live">直播</string>
+    <string name="unknow">未知</string>
 </resources>

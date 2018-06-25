@@ -35,24 +35,18 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
     TVApplication app;
     Program program;
     List<Card> cardList;
+    int curFileIdx = 0;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         app = TVApplication.getInstance();
 
-        //查找pgogram
-        for(Channel c : app.data.channels){
-            if(c.name.equals(app.curChannel)){
-                for(Program p : c.programs){
-                    if(p.id==app.curCardId){
-                        program = p;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
+        Intent intent = getActivity().getIntent();
+        String channel = intent.getStringExtra("channel");
+        String identifier = intent.getStringExtra("identifier");
+        curFileIdx = intent.getIntExtra("curFileIdx", 0);
+        program = app.findProgram(channel, identifier);
 
         if(program!=null) {
             setTitle(program.name);
@@ -70,8 +64,11 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
                 Card card = (Card) item;
-                app.curFileIdx = cardList.indexOf(card);
+                curFileIdx = cardList.indexOf(card);
                 Intent intent = new Intent(getActivity().getBaseContext(), VideoPlayerActivity.class);
+                intent.putExtra("channel", program.channel);
+                intent.putExtra("identifier", program.identifier);
+                intent.putExtra("curFileIdx", curFileIdx);
                 startActivity(intent);
                 getActivity().finish();
             }
