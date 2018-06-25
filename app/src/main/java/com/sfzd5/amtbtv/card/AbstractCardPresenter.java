@@ -8,11 +8,7 @@ import android.view.ViewGroup;
 import com.sfzd5.amtbtv.model.Card;
 
 /**
- * This abstract, generic class will create and manage the
- * ViewHolder and will provide typed Presenter callbacks such that you do not have to perform casts
- * on your own.
  *
- * @param <T> View type for the card.
  */
 public abstract class AbstractCardPresenter<T extends BaseCardView> extends Presenter {
 

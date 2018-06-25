@@ -18,8 +18,7 @@ import android.content.Context;
 import com.sfzd5.amtbtv.model.Card;
 
 /**
- * The Presenter displays a card consisting of text as a replacement for a big image. The footer is
- * also quite unique since it does contain two images rather than one or non.
+ *
  */
 public class TextCardPresenter extends AbstractCardPresenter<TextCardView> {
 

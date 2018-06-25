@@ -15,9 +15,7 @@ import com.sfzd5.amtbtv.util.CacheResult;
 
 
 /**
- * A very basic {@link ImageCardView} {@link android.support.v17.leanback.widget.Presenter}.You can
- * pass a custom style for the ImageCardView in the constructor. Use the default constructor to
- * create a Presenter with a default ImageCardView style.
+ *
  */
 public class ImageCardViewPresenter extends AbstractCardPresenter<ImageCardView> {
 

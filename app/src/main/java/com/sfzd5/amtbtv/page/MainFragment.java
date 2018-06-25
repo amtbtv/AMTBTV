@@ -17,7 +17,6 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridPresenter;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -41,35 +40,26 @@ import java.util.List;
 
 public class MainFragment extends BrowseFragment {
 
-    private BackgroundManager mBackgroundManager;
     private ArrayObjectAdapter mRowsAdapter;
     private TVApplication app;
     Handler handler;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handler = new Handler();
         app = TVApplication.getInstance();
-        setupUi();
-        loadData();
-        mBackgroundManager = BackgroundManager.getInstance(getActivity());
-        mBackgroundManager.attach(getActivity().getWindow());
-        getMainFragmentRegistry().registerFragment(PageRow.class,
-                new PageRowFragmentFactory(mBackgroundManager));
-
-    }
-
-    private void setupUi() {
-        setHeadersState(HEADERS_ENABLED);
-        setHeadersTransitionOnBackEnabled(true);
-        setBrandColor(getResources().getColor(R.color.fastlane_background));
 
         //设置标题
         setTitle(getString(R.string.amtb_tv_title));
-
         prepareEntranceTransition();
-    }
 
+        loadData();
+
+        getMainFragmentRegistry().registerFragment(PageRow.class,
+                new PageRowFragmentFactory());
+
+    }
 
     private void loadData() {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
@@ -94,7 +84,7 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void createRows() {
-        JsonResult data = TVApplication.getInstance().data;
+        JsonResult data = app.data;
 
         int id = -1;
         //检测是否存在播放记录，若存在则加入播放记录
@@ -122,17 +112,10 @@ public class MainFragment extends BrowseFragment {
     }
 
     private static class PageRowFragmentFactory extends BrowseFragment.FragmentFactory {
-        private final BackgroundManager mBackgroundManager;
-
-        PageRowFragmentFactory(BackgroundManager backgroundManager) {
-            this.mBackgroundManager = backgroundManager;
-        }
-
         @Override
         public Fragment createFragment(Object rowObj) {
             Row row = (Row)rowObj;
             HeaderItem headerItem = row.getHeaderItem();
-            mBackgroundManager.setDrawable(null);
             Fragment fragment = new CardGridFragment();
             Bundle bundle = new Bundle();
             bundle.putString("channel", headerItem.getName());
@@ -198,29 +181,28 @@ public class MainFragment extends BrowseFragment {
 
         private void loadData() {
             TVApplication app = TVApplication.getInstance();
-            if(id==-1){//历史
+            if (id == -1) {//历史
                 List<Card> cards = new ArrayList<>();
-                for(History history : app.historyManager.historyList){
-                        for(Channel channel : app.data.channels){
-                            if(channel.name.equals(history.channel)){
-                                for(Program p : channel.programs){
-                                    if(p.identifier.equals(history.identifier)){
-                                        p.currentPosition = history.currentPosition;
-                                        cards.add(p);
-                                        break;
-                                    }
+                for (History history : app.historyManager.historyList) {
+                    for (Channel channel : app.data.channels) {
+                        if (channel.name.equals(history.channel)) {
+                            for (Program p : channel.programs) {
+                                if (p.identifier.equals(history.identifier)) {
+                                    p.currentPosition = history.currentPosition;
+                                    cards.add(p);
+                                    break;
                                 }
-                                break;
                             }
+                            break;
                         }
-                    //}
+                    }
                 }
                 mAdapter.addAll(0, cards);
-            } else if (id==0){
+            } else if (id == 0) {
                 mAdapter.addAll(0, app.data.lives);
             } else {
-                for(Channel channel : app.data.channels){
-                    if(channel.name.equals(this.channel)){
+                for (Channel channel : app.data.channels) {
+                    if (channel.name.equals(this.channel)) {
                         mAdapter.addAll(0, channel.programs);
                         break;
                     }

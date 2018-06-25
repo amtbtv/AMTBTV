@@ -14,8 +14,6 @@ public class TVApplication extends Application {
 
     private static TVApplication sApp;
 
-    // This class will be instantiated once when the application is started, no need to design it
-    // as a singleton on purpose.
     public static TVApplication getInstance() {
         return sApp;
     }
@@ -36,6 +34,7 @@ public class TVApplication extends Application {
         historyManager = new HistoryManager(this);
     }
 
+    //查找节目
     public Program findProgram(String channel, String identifier) {
         for(Channel c : data.channels){
             if(c.name.equals(channel)){
