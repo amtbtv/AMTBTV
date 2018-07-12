@@ -11,4 +11,5 @@
     <string name="history">播放歷史</string>
     <string name="live">直播</string>
     <string name="unknow">未知</string>
+    <string name="down_data_err">獲取數據失敗，可能網絡未連接。</string>
 </resources>

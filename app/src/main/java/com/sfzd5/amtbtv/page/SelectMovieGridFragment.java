@@ -36,6 +36,8 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
     Program program;
     List<Card> cardList;
     int curFileIdx = 0;
+    int amtbid;
+    String identifier;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +46,10 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
 
         Intent intent = getActivity().getIntent();
         String channel = intent.getStringExtra("channel");
-        String identifier = intent.getStringExtra("identifier");
+        identifier = intent.getStringExtra("identifier");
         curFileIdx = intent.getIntExtra("curFileIdx", 0);
-        program = app.findProgram(channel, identifier);
+        amtbid = intent.getIntExtra("amtbid", 0);
+        program = app.findProgram(amtbid, identifier);
 
         if(program!=null) {
             setTitle(program.name);
@@ -67,6 +70,8 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
                 curFileIdx = cardList.indexOf(card);
                 Intent intent = new Intent(getActivity().getBaseContext(), VideoPlayerActivity.class);
                 intent.putExtra("channel", program.channel);
+                intent.putExtra("amtbid", amtbid);
+                intent.putExtra("tp", "Program");
                 intent.putExtra("identifier", program.identifier);
                 intent.putExtra("curFileIdx", curFileIdx);
                 startActivity(intent);
@@ -90,7 +95,7 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
 
     private void createRows() {
         cardList = new ArrayList<>();
-        for(String file : program.files){
+        for(String file : app.filesHashMap.get(identifier)){
             Card card = new Card();
             String[] ss = file.split("-");
             String s = ss[2];

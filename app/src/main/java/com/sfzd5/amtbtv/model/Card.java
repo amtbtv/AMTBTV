@@ -4,9 +4,9 @@ public class Card {
     public String channel;
     public String name;
     //120*131
-    private String cardPic;
+    protected String cardPic;
     //600*350
-    private String bgPic;
+    protected String bgPic;
 
     public String getCardPic() {
         return cardPic;
@@ -24,5 +24,4 @@ public class Card {
         this.bgPic = bgPic;
     }
 
-    public int currentPosition = 0;
 }

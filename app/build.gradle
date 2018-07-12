@@ -8,8 +8,8 @@ android {
         applicationId "com.sfzd5.amtbtv"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 7
-        versionName '1.0.7'
+        versionCode 8
+        versionName '2.0.1'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             //设置支持的SO库架构

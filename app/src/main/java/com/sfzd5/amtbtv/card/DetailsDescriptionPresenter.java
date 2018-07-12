@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sfzd5.amtbtv.R;
+import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.model.Program;
 import com.sfzd5.amtbtv.page.ResourceCache;
 
@@ -36,7 +37,7 @@ public class DetailsDescriptionPresenter extends Presenter {
         sndText1.setText(card.recDate);
         sndText2.setText(card.recAddress);
 
-        extraText.setText(String.format(mContext.getString(R.string.detail_format), card.files.size()));
+        extraText.setText(String.format(mContext.getString(R.string.detail_format), TVApplication.getInstance().filesHashMap.get(card.identifier).size()));
 
     }
 

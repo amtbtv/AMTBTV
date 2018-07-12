@@ -59,7 +59,7 @@ public class ImageCardViewPresenter extends AbstractCardPresenter<ImageCardView>
         if(!bset) {
             app.http.asyncTakeFile(card.getCardPic(), new CacheResult() {
                 @Override
-                public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
+                public void tackFile(final Bitmap bmp) {
                     if (bmp != null) {
                         handler.post(new Runnable() {
                             @Override
@@ -69,7 +69,7 @@ public class ImageCardViewPresenter extends AbstractCardPresenter<ImageCardView>
                         });
                     }
                 }
-            }, false);
+            });
         }
     }
 }

@@ -3,12 +3,16 @@ package com.sfzd5.amtbtv;
 import android.app.Application;
 
 import com.sfzd5.amtbtv.model.Channel;
-import com.sfzd5.amtbtv.model.JsonResult;
+import com.sfzd5.amtbtv.model.LiveChannelListResult;
 import com.sfzd5.amtbtv.model.Program;
+import com.sfzd5.amtbtv.model.ProgramListResult;
 import com.sfzd5.amtbtv.util.CacheOKHttp;
 import com.sfzd5.amtbtv.util.HistoryManager;
 import com.sfzd5.amtbtv.util.TW2CN;
 import com.tencent.bugly.Bugly;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class TVApplication extends Application {
 
@@ -18,7 +22,9 @@ public class TVApplication extends Application {
         return sApp;
     }
 
-    public JsonResult data = null;
+    public LiveChannelListResult data = null;
+    public HashMap<Integer, ProgramListResult> programListResultHashMap = new HashMap<>();
+    public HashMap<String, List<String>> filesHashMap = new HashMap<>();
     public CacheOKHttp http = null;
     public HistoryManager historyManager = null;
     public TW2CN tw2cn;
@@ -34,15 +40,28 @@ public class TVApplication extends Application {
         historyManager = new HistoryManager(this);
     }
 
-    //查找节目
+    //查找已下载节目
+    public Program findProgram(int amtbId, String identifier) {
+        if(programListResultHashMap.containsKey(amtbId)) {
+            for(Program p : programListResultHashMap.get(amtbId).programs){
+                if(p.identifier.equals(identifier))
+                    return p;
+            }
+        }
+        return null;
+    }
     public Program findProgram(String channel, String identifier) {
+        int amtbId = 0;
         for(Channel c : data.channels){
             if(c.name.equals(channel)){
-                for(Program p : c.programs){
-                    if(p.identifier.equals(identifier)){
-                        return p;
-                    }
-                }
+                amtbId = c.amtbid;
+                break;
+            }
+        }
+        if(programListResultHashMap.containsKey(amtbId)) {
+            for(Program p : programListResultHashMap.get(amtbId).programs){
+                if(p.identifier.equals(identifier))
+                    return p;
             }
         }
         return null;

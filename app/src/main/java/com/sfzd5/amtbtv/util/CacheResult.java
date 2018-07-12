@@ -9,5 +9,5 @@ import java.io.File;
  */
 
 public interface CacheResult {
-    void tackFile(String txt, Bitmap bmp, boolean isTxt);
+    void tackFile(Bitmap bmp);
 }

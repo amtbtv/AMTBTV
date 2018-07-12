@@ -2,10 +2,8 @@ package com.sfzd5.amtbtv.page;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.FocusHighlight;
@@ -19,17 +17,18 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridPresenter;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
+import com.sfzd5.amtbtv.util.AmtbApi;
+import com.sfzd5.amtbtv.util.AmtbApiCallBack;
 import com.sfzd5.amtbtv.R;
 import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.card.CardPresenterSelector;
 import com.sfzd5.amtbtv.model.Card;
 import com.sfzd5.amtbtv.model.Channel;
 import com.sfzd5.amtbtv.model.History;
-import com.sfzd5.amtbtv.model.JsonResult;
+import com.sfzd5.amtbtv.model.LiveChannelListResult;
 import com.sfzd5.amtbtv.model.Live;
 import com.sfzd5.amtbtv.model.Program;
-import com.sfzd5.amtbtv.util.CacheResult;
+import com.sfzd5.amtbtv.model.ProgramListResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,61 +53,51 @@ public class MainFragment extends BrowseFragment {
         setTitle(getString(R.string.amtb_tv_title));
         prepareEntranceTransition();
 
-        loadData();
-
         getMainFragmentRegistry().registerFragment(PageRow.class,
                 new PageRowFragmentFactory());
 
+        loadData();
     }
 
     private void loadData() {
-        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
-        setAdapter(mRowsAdapter);
-
-        app.http.asyncTakeFile("tvprogram.txt", new CacheResult() {
+        getProgressBarManager().show();
+        AmtbApi<LiveChannelListResult> api = new AmtbApi<>(AmtbApi.takeLiveChannelsUrl(), new AmtbApiCallBack<LiveChannelListResult>() {
             @Override
-            public void tackFile(String txt, Bitmap bmp, boolean isTxt) {
-                if(txt!=null){
-                    app.data = new Gson().fromJson(txt, JsonResult.class);
-
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            createRows();
-                            startEntranceTransition();
-                        }
-                    });
+            public void callBack(LiveChannelListResult obj) {
+                if(obj!=null) {
+                    getProgressBarManager().hide();
+                    app.data = obj;
+                    createRows();
+                    startEntranceTransition();
+                } else {
+                    Toast.makeText(MainFragment.this.getActivity(), R.string.down_data_err, Toast.LENGTH_LONG).show();
                 }
             }
-        }, true, "http://amtb.sfzd5.com/");
+        });
+        api.execute(LiveChannelListResult.class);
     }
 
     private void createRows() {
-        JsonResult data = app.data;
-
-        int id = -1;
+        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         //检测是否存在播放记录，若存在则加入播放记录
         if(app.historyManager.historyList.size()>0){
-            HeaderItem headerItem = new HeaderItem(id, getString(R.string.history));
+            HeaderItem headerItem = new HeaderItem(-1, getString(R.string.history));
             PageRow pageRow = new PageRow(headerItem);
             mRowsAdapter.add(pageRow);
         }
 
         //直播节目
-        id++;
-        HeaderItem headerItem1 = new HeaderItem(id, getString(R.string.live));
+        HeaderItem headerItem1 = new HeaderItem(0, getString(R.string.live));
         PageRow pageRow1 = new PageRow(headerItem1);
         mRowsAdapter.add(pageRow1);
 
         //点播节目
-        for(Channel c : data.channels){
-            if(c.programs.size()>0) {
-                id++;
-                HeaderItem headerItem = new HeaderItem(id, c.name);
-                PageRow pageRow = new PageRow(headerItem);
-                mRowsAdapter.add(pageRow);
-            }
+        for(Channel c : app.data.channels) {
+            HeaderItem headerItem = new HeaderItem(c.amtbid, c.name);
+            PageRow pageRow = new PageRow(headerItem);
+            mRowsAdapter.add(pageRow);
         }
+        setAdapter(mRowsAdapter);
     }
 
     private static class PageRowFragmentFactory extends BrowseFragment.FragmentFactory {
@@ -130,19 +119,17 @@ public class MainFragment extends BrowseFragment {
         private final int ZOOM_FACTOR = FocusHighlight.ZOOM_FACTOR_SMALL;
         private ArrayObjectAdapter mAdapter;
         private String channel;
-        private int id;
+        private int heaerItemId;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             Bundle bundle = this.getArguments();
             this.channel = bundle.getString("channel");
-            this.id = bundle.getInt("id");
+            this.heaerItemId = bundle.getInt("id");
             setupAdapter();
             loadData();
-            this.getMainFragmentAdapter().getFragmentHost().notifyDataReady(getMainFragmentAdapter());
         }
-
 
         private void setupAdapter() {
             VerticalGridPresenter presenter = new VerticalGridPresenter(ZOOM_FACTOR);
@@ -161,10 +148,17 @@ public class MainFragment extends BrowseFragment {
                         RowPresenter.ViewHolder rowViewHolder,
                         Row row) {
                     Card card = (Card) item;
-                    if(item instanceof Program){
+                    if(item instanceof History){
+                        History history = (History) card;
+                        Intent intent = new Intent(getActivity().getBaseContext(), DetailActivity.class);
+                        intent.putExtra("tp", "History");
+                        intent.putExtra("identifier", history.identifier);
+                        startActivity(intent);
+                    } else if(item instanceof Program){
                         Program program = (Program) card;
                         Intent intent = new Intent(getActivity().getBaseContext(), DetailActivity.class);
-                        intent.putExtra("channel", program.channel);
+                        intent.putExtra("tp", "Program");
+                        intent.putExtra("amtbid", heaerItemId);
                         intent.putExtra("identifier", program.identifier);
                         startActivity(intent);
                     } else if(item instanceof Live){
@@ -181,31 +175,42 @@ public class MainFragment extends BrowseFragment {
 
         private void loadData() {
             TVApplication app = TVApplication.getInstance();
-            if (id == -1) {//历史
+            if (heaerItemId == -1) {//历史
                 List<Card> cards = new ArrayList<>();
                 for (History history : app.historyManager.historyList) {
-                    for (Channel channel : app.data.channels) {
-                        if (channel.name.equals(history.channel)) {
-                            for (Program p : channel.programs) {
-                                if (p.identifier.equals(history.identifier)) {
-                                    p.currentPosition = history.currentPosition;
-                                    cards.add(p);
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
+                    cards.add(history);
                 }
                 mAdapter.addAll(0, cards);
-            } else if (id == 0) {
+                MainFragmentAdapter mainFragmentAdapter = this.getMainFragmentAdapter();
+                mainFragmentAdapter.getFragmentHost().notifyDataReady(mainFragmentAdapter);
+            } else if (heaerItemId == 0) { //直播
                 mAdapter.addAll(0, app.data.lives);
-            } else {
-                for (Channel channel : app.data.channels) {
-                    if (channel.name.equals(this.channel)) {
-                        mAdapter.addAll(0, channel.programs);
-                        break;
-                    }
+                MainFragmentAdapter mainFragmentAdapter = this.getMainFragmentAdapter();
+                mainFragmentAdapter.getFragmentHost().notifyDataReady(mainFragmentAdapter);
+            } else { //点播
+                //final int amtbid = heaerItemId;
+                if (app.programListResultHashMap.containsKey(heaerItemId)) {
+                    mAdapter.addAll(0, app.programListResultHashMap.get(heaerItemId).programs);
+                    MainFragmentAdapter mainFragmentAdapter = this.getMainFragmentAdapter();
+                    mainFragmentAdapter.getFragmentHost().notifyDataReady(mainFragmentAdapter);
+                } else {
+                    AmtbApi<ProgramListResult> api = new AmtbApi<>(AmtbApi.takeProgramsUrl(heaerItemId), new AmtbApiCallBack<ProgramListResult>() {
+                        @Override
+                        public void callBack(ProgramListResult obj) {
+                            if(obj!=null) {
+                                TVApplication app = TVApplication.getInstance();
+                                app.programListResultHashMap.put(heaerItemId, obj);
+                                for (Program p : obj.programs)
+                                    p.channel = channel;
+                                mAdapter.addAll(0, obj.programs);
+                                MainFragmentAdapter mainFragmentAdapter = CardGridFragment.this.getMainFragmentAdapter();
+                                mainFragmentAdapter.getFragmentHost().notifyDataReady(mainFragmentAdapter);
+                            } else {
+                                Toast.makeText(getActivity(), R.string.down_data_err, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                    api.execute(ProgramListResult.class);
                 }
             }
         }

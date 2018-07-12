@@ -18,17 +18,20 @@ import com.sfzd5.amtbtv.model.Channel;
 import com.sfzd5.amtbtv.model.History;
 import com.sfzd5.amtbtv.model.Program;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2018/3/10.
  */
 
 public class VideoPlayerFragment  extends VideoFragment {
-
-    Program program = null;
     int idx = 0;
     TVApplication app;
     History history;
     Handler handler;
+    int amtbid;
+    List<String> files;
+    String tp;
 
     private static String URL = "";
     public static final String TAG = "VideoConsumption";
@@ -81,79 +84,92 @@ public class VideoPlayerFragment  extends VideoFragment {
         String channel = intent.getStringExtra("channel");
         String identifier = intent.getStringExtra("identifier");
         idx = intent.getIntExtra("curFileIdx", 0);
-        program = app.findProgram(channel, identifier);
+        amtbid = intent.getIntExtra("amtbid", 0);
+        tp = intent.getStringExtra("tp");
+        files = app.filesHashMap.get(identifier);
 
-        if (program != null) {
-
+        if (tp.equals("History")) {
+            history = app.historyManager.findHistory(identifier);
+            app.historyManager.historyList.remove(history);
+            app.historyManager.historyList.add(0, history);
+            app.historyManager.save();
+        } else {
+            Program program = app.findProgram(amtbid, identifier);
             //记录历史记录
             history = app.historyManager.findProgramHistory(program);
-            if(history==null){
+            if (history == null) {
                 history = new History();
                 history.channel = program.channel;
                 history.identifier = program.identifier;
                 history.fileIdx = idx;
                 history.currentPosition = 0;
+                history.name = program.name;
+                history.picCreated = program.picCreated;
+                history.recAddress = program.recAddress;
+                history.recDate = program.recDate;
                 app.historyManager.historyList.add(0, history);
                 app.historyManager.save();
             } else {
                 app.historyManager.historyList.remove(history);
                 app.historyManager.historyList.add(0, history);
+                app.historyManager.save();
             }
 
-            mMediaPlayerGlue = new VideoMediaPlayerGlue(getActivity(), new MediaPlayerAdapter(getActivity()));
-            mMediaPlayerGlue.setHost(mHost);
-            AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-            if (audioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
-                    AudioManager.AUDIOFOCUS_GAIN) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.w(TAG, "video player cannot obtain audio focus!");
-            }
-
-            setSeekProvider(mMediaPlayerGlue);
-
-            mMediaPlayerGlue.addPlayerCallback(new PlaybackGlue.PlayerCallback() {
-                @Override
-                public void onPlayCompleted(PlaybackGlue glue) {
-                    super.onPlayCompleted(glue);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            history.currentPosition = 0;
-                            play(1);
-                            history.fileIdx = idx;
-                            history.currentPosition = 0;
-                            app.historyManager.save();
-                        }
-                    });
-                }
-            });
-
-            play(0);
         }
+
+        mMediaPlayerGlue = new VideoMediaPlayerGlue(getActivity(), new MediaPlayerAdapter(getActivity()));
+        mMediaPlayerGlue.setHost(mHost);
+        AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.w(TAG, "video player cannot obtain audio focus!");
+        }
+
+        setSeekProvider(mMediaPlayerGlue);
+
+        mMediaPlayerGlue.addPlayerCallback(new PlaybackGlue.PlayerCallback() {
+            @Override
+            public void onPlayCompleted(PlaybackGlue glue) {
+                super.onPlayCompleted(glue);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        history.currentPosition = 0;
+                        play(1);
+                        history.fileIdx = idx;
+                        history.currentPosition = 0;
+                        app.historyManager.save();
+                    }
+                });
+            }
+        });
+
+        play(0);
     }
 
     String takeFile(int p){
         if(p==-1){//前一个
             if(idx==0)
-                idx=program.files.size()-1;
+                idx=files.size()-1;
             else
                 idx--;
         } else if (p==1){
-            if(idx==program.files.size()-1)
+            if(idx==files.size()-1)
                 idx=0;
             else
                 idx++;
         }
-        String file = program.files.get(idx);
+        String file = files.get(idx);
         return file;
     }
 
     void play(int p) {
         String file = takeFile(p);
 
-        mMediaPlayerGlue.setTitle(program.name);
+        mMediaPlayerGlue.setTitle(history.name);
         mMediaPlayerGlue.setSubtitle(file);
-        String[] us = program.identifier.split("-");
-        URL = "http://amtbsg.cloudapp.net/redirect/vod/_definst_/mp4/" + us[0] + "/" + program.identifier + "/" + file + "/playlist.m3u8";
+        String[] us = history.identifier.split("-");
+        URL = "http://amtbsg.cloudapp.net/redirect/vod/_definst_/mp4/" + us[0] + "/" + history.identifier + "/" + file + "/playlist.m3u8";
 
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(URL));
 

@@ -41,4 +41,13 @@ public class HistoryManager {
         editor.putString("historyList", new Gson().toJson(historyList));
         editor.commit();
     }
+
+    public History findHistory(String identifier) {
+        for(History history : historyList){
+            if(history.identifier.equals(identifier)){
+                return history;
+            }
+        }
+        return null;
+    }
 }

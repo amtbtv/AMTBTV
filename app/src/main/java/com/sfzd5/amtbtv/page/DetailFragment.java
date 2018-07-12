@@ -24,14 +24,20 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.sfzd5.amtbtv.util.AmtbApi;
+import com.sfzd5.amtbtv.util.AmtbApiCallBack;
 import com.sfzd5.amtbtv.R;
 import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.card.DetailsDescriptionPresenter;
 import com.sfzd5.amtbtv.model.Channel;
+import com.sfzd5.amtbtv.model.FileListResult;
 import com.sfzd5.amtbtv.model.History;
 import com.sfzd5.amtbtv.model.Program;
 import com.sfzd5.amtbtv.util.CacheResult;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/3/1.
@@ -59,6 +65,9 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
     TVApplication app;
     private Program program;
     int curFileIdx = 0;
+    int amtbid;
+    String identifier;
+    String tp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,12 +77,43 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
         app = TVApplication.getInstance();
 
         Intent intent = getActivity().getIntent();
-        String channel = intent.getStringExtra("channel");
-        String identifier = intent.getStringExtra("identifier");
-        program = app.findProgram(channel, identifier);
+        tp = intent.getStringExtra("tp");
+        if(tp.equals("History")){
+            identifier = intent.getStringExtra("identifier");
+            program = app.historyManager.findHistory(identifier);
 
-        setupUi();
-        setupEventListeners();
+            identifier = program.identifier;
+            for(Channel c : app.data.channels){
+                if(c.name.equals(program.channel)){
+                    amtbid = c.amtbid;
+                    break;
+                }
+            }
+        } else {
+            amtbid = intent.getIntExtra("amtbid", 0);
+            identifier = intent.getStringExtra("identifier");
+            program = app.findProgram(amtbid, identifier);
+        }
+        if(app.filesHashMap.containsKey(amtbid)) {
+            setupUi();
+            setupEventListeners();
+        } else {
+            getProgressBarManager().show();
+            AmtbApi<FileListResult> api = new AmtbApi<>(AmtbApi.takeFilesUrl(identifier), new AmtbApiCallBack<FileListResult>() {
+                @Override
+                public void callBack(FileListResult obj) {
+                    getProgressBarManager().hide();
+                    if(obj!=null){
+                        app.filesHashMap.put(identifier, obj.files);
+                        setupUi();
+                        setupEventListeners();
+                    } else {
+                        Toast.makeText(DetailFragment.this.getActivity(), R.string.down_data_err, Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            api.execute(FileListResult.class);
+        }
     }
 
     private void setupUi() {
@@ -119,18 +159,19 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
 
         ArrayObjectAdapter actionAdapter = new ArrayObjectAdapter();
 
-        String fileName = program.files.get(0);
+        List<String> files = app.filesHashMap.get(identifier);
+        String fileName = files.get(0);
         //查看是否存在播放记录
         History history = app.historyManager.findProgramHistory(program);
         if(history!=null) {
-            fileName = program.files.get(history.fileIdx);
+            fileName = files.get(history.fileIdx);
             curFileIdx = history.fileIdx;
         }
 
         mActionPlay = new Action(ACTION_PLAY, getString(R.string.bofang)+fileName);
         actionAdapter.add(mActionPlay);
 
-        if(program.files.size()>1) {
+        if(files.size()>1) {
             mActionSelectMovie = new Action(ACTION_SELECT_MOVIE, getString(R.string.xuanji));
             actionAdapter.add(mActionSelectMovie);
         }
@@ -150,28 +191,34 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
         mDetailsBackground.enableParallax();
         mDetailsBackground.setCoverBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.cardbg));
         if(program.picCreated==1){
-            app.http.asyncTakeFile(program.getCardPic(), new CacheResult() {
-                @Override
-                public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            detailsOverview.setImageDrawable(new BitmapDrawable(bmp));
-                        }
-                    });
-                }
-            }, false);
+            /*
             app.http.asyncTakeFile(program.getBgPic(), new CacheResult() {
                 @Override
-                public void tackFile(String txt, final Bitmap bmp, boolean isTxt) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDetailsBackground.setCoverBitmap(bmp);
-                        }
-                    });
+                public void tackFile(final Bitmap bmp) {
+                    if(bmp!=null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mDetailsBackground.setCoverBitmap(bmp);
+                            }
+                        });
+                    }
                 }
-            }, false);
+            });
+            */
+            app.http.asyncTakeFile(program.getCardPic(), new CacheResult() {
+                @Override
+                public void tackFile(final Bitmap bmp) {
+                    if(bmp!=null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                detailsOverview.setImageDrawable(new BitmapDrawable(bmp));
+                            }
+                        });
+                    }
+                }
+            });
         }
         //initializeBackground(data);
     }
@@ -190,12 +237,15 @@ public class DetailFragment extends DetailsFragment implements OnItemViewClicked
         if (action.getId() == ACTION_PLAY) {
             Intent intent = new Intent(getActivity().getBaseContext(), VideoPlayerActivity.class);
             intent.putExtra("channel", program.channel);
+            intent.putExtra("amtbid", amtbid);
             intent.putExtra("identifier", program.identifier);
+            intent.putExtra("tp", tp);
             intent.putExtra("curFileIdx", curFileIdx);
             startActivity(intent);
         } else if (action.getId() == ACTION_SELECT_MOVIE) {
             Intent intent = new Intent(getActivity().getBaseContext(), SelectMovieActivity.class);
             intent.putExtra("channel", program.channel);
+            intent.putExtra("amtbid", amtbid);
             intent.putExtra("identifier", program.identifier);
             intent.putExtra("curFileIdx", curFileIdx);
             startActivity(intent);

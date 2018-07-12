@@ -4,5 +4,5 @@ import java.util.List;
 
 public class Channel {
     public String name;
-    public List<Program> programs;
+    public int amtbid;
 }
