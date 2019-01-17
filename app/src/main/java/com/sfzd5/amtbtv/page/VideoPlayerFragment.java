@@ -13,6 +13,7 @@ import android.support.v17.leanback.media.PlaybackGlue;
 import android.support.v17.leanback.media.PlaybackTransportControlGlue;
 import android.util.Log;
 
+import com.sfzd5.amtbtv.ServerConst;
 import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.model.Channel;
 import com.sfzd5.amtbtv.model.History;
@@ -168,8 +169,7 @@ public class VideoPlayerFragment  extends VideoFragment {
 
         mMediaPlayerGlue.setTitle(history.name);
         mMediaPlayerGlue.setSubtitle(file);
-        String[] us = history.identifier.split("-");
-        URL = "http://amtbsg.cloudapp.net/redirect/vod/_definst_/mp4/" + us[0] + "/" + history.identifier + "/" + file + "/playlist.m3u8";
+        URL = ServerConst.getProgramVideoUrl(history.identifier, file);
 
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(URL));
 

@@ -1,16 +1,18 @@
 package com.sfzd5.amtbtv.model;
 
+import com.sfzd5.amtbtv.ServerConst;
+
 public class Live extends Card {
     public String mediaUrl;
     public String listUrl;
 
     @Override
     public String getCardPic() {
-        return "http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/" + cardPic;
+        return ServerConst.getLiveCardPic(cardPic);
     }
 
     @Override
     public String getBgPic() {
-        return "http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/" + bgPic;
+        return ServerConst.getLiveBgPic(bgPic);
     }
 }

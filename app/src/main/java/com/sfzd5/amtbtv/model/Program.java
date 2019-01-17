@@ -1,5 +1,7 @@
 package com.sfzd5.amtbtv.model;
 
+import com.sfzd5.amtbtv.ServerConst;
+
 import java.sql.Date;
 import java.util.List;
 
@@ -23,11 +25,11 @@ public class Program extends Card {
 
     @Override
     public String getCardPic() {
-        return "http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/" + identifier + "_card.jpg";
+        return ServerConst.getProgramCardPic(identifier);
     }
 
     @Override
     public String getBgPic() {
-        return "http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/" + identifier + "_bg.jpg";
+        return ServerConst.getProgramBgPic(identifier);
     }
 }

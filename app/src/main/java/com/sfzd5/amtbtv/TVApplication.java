@@ -34,7 +34,7 @@ public class TVApplication extends Application {
         super.onCreate();
         sApp = this;
         //腾讯错误收集和自动升级服务注册
-        Bugly.init(getApplicationContext(), "61728fcbac", false);
+        Bugly.init(getApplicationContext(), "de2442c77c", false);
         tw2cn = TW2CN.getInstance(this);
         http = new CacheOKHttp(this);
         historyManager = new HistoryManager(this);
