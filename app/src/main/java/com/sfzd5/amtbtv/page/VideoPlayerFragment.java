@@ -113,6 +113,8 @@ public class VideoPlayerFragment  extends VideoFragment {
             } else {
                 app.historyManager.historyList.remove(history);
                 app.historyManager.historyList.add(0, history);
+                if(history.fileIdx != idx)
+                    history.currentPosition = 0;
                 app.historyManager.save();
             }
 
@@ -135,17 +137,18 @@ public class VideoPlayerFragment  extends VideoFragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        String file = takeFile(1);
                         history.currentPosition = 0;
-                        play(1);
                         history.fileIdx = idx;
-                        history.currentPosition = 0;
                         app.historyManager.save();
+                        play(file);
                     }
                 });
             }
         });
 
-        play(0);
+        String file = takeFile(0);
+        play(file);
     }
 
     String takeFile(int p){
@@ -164,9 +167,7 @@ public class VideoPlayerFragment  extends VideoFragment {
         return file;
     }
 
-    void play(int p) {
-        String file = takeFile(p);
-
+    void play(String file) {
         mMediaPlayerGlue.setTitle(history.name);
         mMediaPlayerGlue.setSubtitle(file);
         URL = ServerConst.getProgramVideoUrl(history.identifier, file);
