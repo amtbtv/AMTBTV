@@ -3,7 +3,7 @@ package com.sfzd5.amtbtv.page;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v17.leanback.app.VerticalGridFragment;
+import android.support.v17.leanback.app.VerticalGridSupportFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.FocusHighlight;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
@@ -26,7 +26,7 @@ import java.util.List;
  * Created by Administrator on 2018/3/1.
  */
 
-public class SelectMovieGridFragment extends VerticalGridFragment {
+public class SelectMovieGridFragment extends VerticalGridSupportFragment {
 
     private static final int COLUMNS = 6;
     private static final int ZOOM_FACTOR = FocusHighlight.ZOOM_FACTOR_MEDIUM;
@@ -38,6 +38,7 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
     int curFileIdx = 0;
     int amtbid;
     String identifier;
+    String tp;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +46,16 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
         app = TVApplication.getInstance();
 
         Intent intent = getActivity().getIntent();
-        String channel = intent.getStringExtra("channel");
+        tp = intent.getStringExtra("tp");
         identifier = intent.getStringExtra("identifier");
-        curFileIdx = intent.getIntExtra("curFileIdx", 0);
         amtbid = intent.getIntExtra("amtbid", 0);
-        program = app.findProgram(amtbid, identifier);
+        String channel = intent.getStringExtra("channel");
+        curFileIdx = intent.getIntExtra("curFileIdx", 0);
+        if(tp.equals("History")){
+            program = app.historyManager.findHistory(identifier);
+        } else {
+            program = app.findProgram(amtbid, identifier);
+        }
 
         if(program!=null) {
             setTitle(program.name);
@@ -71,7 +77,7 @@ public class SelectMovieGridFragment extends VerticalGridFragment {
                 Intent intent = new Intent(getActivity().getBaseContext(), VideoPlayerActivity.class);
                 intent.putExtra("channel", program.channel);
                 intent.putExtra("amtbid", amtbid);
-                intent.putExtra("tp", "Program");
+                intent.putExtra("tp", tp);
                 intent.putExtra("identifier", program.identifier);
                 intent.putExtra("curFileIdx", curFileIdx);
                 startActivity(intent);

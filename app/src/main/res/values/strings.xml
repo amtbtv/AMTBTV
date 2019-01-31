@@ -11,5 +11,8 @@
     <string name="history">播放歷史</string>
     <string name="live">直播</string>
     <string name="unknow">未知</string>
-    <string name="down_data_err">獲取數據失敗，可能網絡未連接。</string>
+    <string name="down_data_err">獲取數據失敗，可能網酪未連接。</string>
+    <string name="playback_tag">PLAYBACK_TAG</string>
+    <string name="history_remove">歷史記錄已移除</string>
+    <string name="program_change">節目發生變化，本歷史記錄已移除</string>
 </resources>

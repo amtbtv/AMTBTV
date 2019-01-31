@@ -42,6 +42,11 @@ public class HistoryManager {
         editor.commit();
     }
 
+    public void removeHistory(History history) {
+        historyList.remove(history);
+        save();
+    }
+
     public History findHistory(String identifier) {
         for(History history : historyList){
             if(history.identifier.equals(identifier)){

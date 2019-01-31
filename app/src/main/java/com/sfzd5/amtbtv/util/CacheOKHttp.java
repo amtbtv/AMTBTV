@@ -45,7 +45,6 @@ public class CacheOKHttp {
             .add("Connection", "keep-alive")
             .add("Accept", "application/json, text/javascript, */*; q=0.01")
             .add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36")
-            .add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
             .add("Accept-Language", "en-US,en;q=0.8")
             .build();
 
@@ -124,17 +123,19 @@ public class CacheOKHttp {
     }
 
 
-    public String take(String url) {
-        Request request = new Request.Builder().headers(headers).cacheControl(cacheControl).url(url).build();
-        try {
-            Response response = client.newCall(request).execute();
-            if(response.isSuccessful()){
-                return response.body().string();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public String take(String url) throws IOException {
+        Request request = new Request.Builder()
+                .headers(headers)
+                .removeHeader("pragma")
+                .cacheControl(cacheControl)
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            return response.body().string();
+        } else {
+            return "";
         }
-        return "";
     }
 
     /**
@@ -142,7 +143,11 @@ public class CacheOKHttp {
      */
     public void asyncTakeFile(String url, final CacheResult fileCacheResult)
     {
-        Request request = new Request.Builder().cacheControl(cacheControlPic).url(url).build();
+        Request request = new Request.Builder()
+                .removeHeader("pragma")
+                .cacheControl(cacheControlPic)
+                .url(url)
+                .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

@@ -7,6 +7,8 @@ import com.sfzd5.amtbtv.ServerConst;
 import com.sfzd5.amtbtv.TVApplication;
 import com.sfzd5.amtbtv.model.Result;
 
+import java.io.IOException;
+
 public class AmtbApi<T extends Result> extends AsyncTask<Class<T>, Integer, T> {
 
     public static String takeLiveChannelsUrl(){
@@ -43,10 +45,14 @@ public class AmtbApi<T extends Result> extends AsyncTask<Class<T>, Integer, T> {
 
     @Override
     protected T doInBackground(Class<T>... parms) {
-        String json = TVApplication.getInstance().http.take(url);
-        if (!json.isEmpty()) {
-            T val = new Gson().fromJson(json, parms[0]);
-            return val;
+        try {
+            String json = TVApplication.getInstance().http.take(url);
+            if (!json.isEmpty()) {
+                T val = new Gson().fromJson(json, parms[0]);
+                return val;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
