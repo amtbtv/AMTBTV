@@ -3,7 +3,7 @@ package com.sfzd5.amtbtv;
 public class ServerConst {
 
     /**
-     *不好意思，下面還有兩處修改(amtbsg.cloudapp.net申請不了https證書，需要替換域名）
+     *不好意思，下面還有兩處修改(amtbsg.cloudapp.net申請不了https證書，需要替換域名）     private static final String ServerDomain="amtb.de";
      *
      * A、文檔裡的下面這個獲取bg和card圖片地址域名有修改，也改成https了
      * 四、bg和card圖片地址
@@ -19,23 +19,23 @@ public class ServerConst {
      * URL = "https://vod.hwadzan.com/redirect/vod/_definst_/mp4/" + us[0] + "/" + history.identifier + "/" + file + "/playlist.m3u8";
      */
     //{"channels":[{"name":"\u963f\u5f4c\u9640\u7d93","amtbid":"1"},{"name":"\u7121\u91cf\u58fd\u7d93","amtbid":"2"}]}
-    private static final String liveChannelsUrl  = "https://amtbapi.hwadzan.com/amtbtv/channels/live,mp4";
+    private static final String liveChannelsUrl  = "https://amtbapi.amtb.de/amtbtv/channels/live,mp4";
 
     //{"files":["02-012-0001.mp4","02-012-0002.mp4"]}
-    private static final String filesUrl  = "https://amtbapi.hwadzan.com/amtbtv/%s/mp4";
+    private static final String filesUrl  = "https://amtbapi.amtb.de/amtbtv/%s/mp4";
 
     //{"programs":[{"name":"\u7121\u91cf\u58fd\u7d93\u5927\u610f","identifier":"02-002","recDate":"1992.12","recAddress":"\u7f8e\u570b","picCreated":"1","mp4":"1","mp3":"1"}]}
-    private static final String programsUrl  = "https://amtbapi.hwadzan.com/amtbtv/%d/mp4";
+    private static final String programsUrl  = "https://amtbapi.amtb.de/amtbtv/%d/mp4";
 
     //最近视频，暂时先不使用此功能
-    private static final String newMediasUrl = "https://amtbapi.hwadzan.com/amtbtv/newmedias/mp4?limit=20";
+    private static final String newMediasUrl = "https://amtbapi.amtb.de/amtbtv/newmedias/mp4?limit=20";
 
-    private static final String picUrl = "https://vod.hwadzan.com/redirect/v/amtbtv/pic/";
+    private static final String picUrl = "https://vod.amtb.de/redirect/v/amtbtv/pic/";
 
     public static String getProgramVideoUrl(String identifier, String file){
         String[] us = identifier.split("-");
         //return "http://amtbsg.cloudapp.net/redirect/vod/_definst_/mp4/" + us[0] + "/" + identifier + "/" + file + "/playlist.m3u8";
-        return "https://vod.hwadzan.com/redirect/vod/_definst_/mp4/" + us[0] + "/" + identifier + "/" + file + "/playlist.m3u8";
+        return "https://vod.amtb.de/redirect/vod/_definst_/mp4/" + us[0] + "/" + identifier + "/" + file + "/playlist.m3u8";
     }
 
     public static String takeLiveChannelsUrl(){
