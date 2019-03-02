@@ -47,6 +47,7 @@ public class VideoPlayerFragment  extends VideoSupportFragment {
     private VideoMediaPlayerGlue<MediaPlayerAdapter> mMediaPlayerGlue;
     final VideoSupportFragmentGlueHost mHost = new VideoSupportFragmentGlueHost(this);
 
+    /*
     static void playWhenReady(VideoMediaPlayerGlue<MediaPlayerAdapter> glue, final int pos) {
         if (glue.isPrepared()) {
             glue.play();
@@ -67,6 +68,7 @@ public class VideoPlayerFragment  extends VideoSupportFragment {
             });
         }
     }
+    */
 
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener
             = new AudioManager.OnAudioFocusChangeListener() {
@@ -189,7 +191,9 @@ public class VideoPlayerFragment  extends VideoSupportFragment {
         String url = ServerConst.getProgramVideoUrl(history.identifier, file);
         mMediaPlayerGlue.setControlsOverlayAutoHideEnabled(true);
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(url));
-        playWhenReady(mMediaPlayerGlue, history.currentPosition);
+
+        //playWhenReady(mMediaPlayerGlue, history.currentPosition);
+
         if (mMediaPlayerGlue.isPrepared()) {
             mMediaPlayerGlue.play();
             if(history.currentPosition>0)
@@ -203,11 +207,12 @@ public class VideoPlayerFragment  extends VideoSupportFragment {
                         glue.removePlayerCallback(this);
                         glue.play();
                         if(history.currentPosition>0)
-                            mMediaPlayerGlue.seekTo(history.currentPosition);
+                            glue.seekTo(history.currentPosition);
                     }
                 }
             });
         }
+
         setBackgroundType(BG_LIGHT);
     }
 
@@ -215,7 +220,9 @@ public class VideoPlayerFragment  extends VideoSupportFragment {
         mMediaPlayerGlue.setTitle(live.name);
         mMediaPlayerGlue.setSubtitle("");;
         String url = live.mediaUrl;
+
         mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(url));
+
         mMediaPlayerGlue.setControlsOverlayAutoHideEnabled(true);
         mMediaPlayerGlue.setSeekEnabled(false);
         mMediaPlayerGlue.setSeekProvider(null);

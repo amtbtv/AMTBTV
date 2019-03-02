@@ -58,7 +58,7 @@ public class CacheOKHttp {
         //缓存文件夹
         File cacheFile = new File(cacheDir.toString(),"tvcache");
         //缓存大小为10M
-        int cacheSize = 20 * 1024 * 1024;
+        int cacheSize = 100 * 1024 * 1024;
         //创建缓存对象
         Cache cache = new Cache(cacheFile,cacheSize);
 
