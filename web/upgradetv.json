@@ -1,7 +1,7 @@
 {
 	"data": {
 		"apkUrl": "http://amtb.sfzd5.com/amtbtv.apk",
-		"upgradeNotes": "更新內容\n首次发布测试版，欢迎测试。\n若有问题请及时联系我。\n电子邮件： do168@126.com",
-		"versionName": "1.0.7 BETA 测试版1"
+		"upgradeNotes": "更新內容\n此APP为测试版，欢迎测试。\n1.直接从弘化网获取数据，感谢杜师兄帮助。\n2.限制安装设备必须为盒子或电视。\n有问题请联系：do168@126.com",
+		"versionName": "2.0.1 BETA 测试版2"
 	}
 }

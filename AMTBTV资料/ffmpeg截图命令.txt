@@ -1,0 +1,3 @@
+ffmpeg -ss 00:05:06 -i http://amtbsg.cloudapp.net/redirect/vod/_definst_/mp4/02/02-041/02-041-0001.mp4/playlist.m3u8 b5.jpg -f image2 -vcodec mjpeg -y -updatefirst 1 -t 0.001 -vframes 1
+
+ffmpeg -ss 00:05:06 -i http://amtbsg.cloudapp.net/redirect/vod/_definst_/mp4/02/02-041/02-041-0001.mp4/playlist.m3u8 -f image2 -y -vframes 1 img.jpeg

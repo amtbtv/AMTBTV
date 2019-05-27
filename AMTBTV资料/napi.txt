@@ -1,0 +1,14 @@
+我:
+學會的分類，大概就這個頁面下面這樣
+http://edu.hwadzan.com/
+我:
+api
+
+末學這裡有個關於直播的api
+
+http://mtv.hwadzan.com/mycalendar/api/channel.php
+
+可以有兩個可選參數(get | post)
+channel_name=livetv            頻道英文名
+channel_date=2016-08-18  日期
+http://mtv.hwadzan.com/mycalendar/api/channel.php?channel_name=livetv&channel_date=2016-08-18

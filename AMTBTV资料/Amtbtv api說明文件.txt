@@ -1,0 +1,90 @@
+Amtbtv api說明文件
+一、獲取大類列表
+URL地址
+http://amtbapi.hwadzan.com/amtbtv/channels[/{mediatype}]
+
+輸入參數
+mediatype 媒體類型是可選參數，默認值包含直播頻道和有mp4的大類：live,mp4（參數之間使用英文逗號分隔），含live,mp4,mp3類型
+
+輸出結果
+直播頻道和 http://amtb.sfzd5.com/tvprogram.txt 中直播一樣
+大類      channels:[{name,amtbid}]
+
+例子：
+獲取直播蘋道和有mp4的大類
+http://amtbapi.hwadzan.com/amtbtv/channels
+http://amtbapi.hwadzan.com/amtbtv/channels/live,mp4
+
+獲取直播頻道
+http://amtbapi.hwadzan.com/amtbtv/channels/live
+
+獲取有mp4的大類
+http://amtbapi.hwadzan.com/amtbtv/channels/mp4
+
+獲取有mp3的大類
+http://amtbapi.hwadzan.com/amtbtv/channels/mp3
+
+
+二、獲取大類下的節目列表和節目信息
+URL地址
+http://amtbapi.hwadzan.com/amtbtv/{amtbid}[/{mediatype}][?order=desc]
+
+輸入參數
+amtbid    大類的編號
+mediatype 媒體類型是可選參數，默認值是mp4(包含有mp4的節目信息)，含mp4,mp3類型
+order     排序方式，可選值：asc|desc, 默認按照lecterno順序asc排列
+
+輸出結果
+節目信息  和http://amtb.sfzd5.com/tvprogram.txt 中的programs類似
+
+例子：
+獲取amtbid=2下的含有mp4的節目信息
+http://amtbapi.hwadzan.com/amtbtv/2
+http://amtbapi.hwadzan.com/amtbtv/2/mp4
+
+獲取amtbid=2下的含有mp4的節目信息(倒序）
+http://amtbapi.hwadzan.com/amtbtv/2?order=desc
+http://amtbapi.hwadzan.com/amtbtv/2/mp4?order=desc
+
+獲取amtbid=2下的含有mp3的節目信息
+http://amtbapi.hwadzan.com/amtbtv/2/mp3
+
+獲取amtbid=2下的含有mp3的節目信息（倒序）
+http://amtbapi.hwadzan.com/amtbtv/2/mp3?order=desc
+
+
+三、獲取節目所屬的媒體文件
+URL地址
+http://amtbapi.hwadzan.com/amtbtv/{identifier}[/{mediatype}][?order=desc]
+
+輸入參數
+identifier 節目的編號（編碼就像這樣 xx-xxx[_XX]）
+mediatype  媒體類型是可選參數，默認值是mp4(包含有mp4的節目信息)，含mp4,mp3類型
+order      排序方式，可選值：asc|desc, 默認按照檔案名順序asc排列
+
+輸出結果
+節目信息  和http://amtb.sfzd5.com/tvprogram.txt 中的files類似
+
+例子：
+獲取節目中的mp4文件列表
+http://amtbapi.hwadzan.com/amtbtv/02-037
+http://amtbapi.hwadzan.com/amtbtv/02-037/mp4
+
+獲取節目中的mp4文件列表(按照文件名倒序排列）
+http://amtbapi.hwadzan.com/amtbtv/02-037?order=desc
+http://amtbapi.hwadzan.com/amtbtv/02-037/mp4?order=desc
+
+獲取節目中的mp3文件列表
+http://amtbapi.hwadzan.com/amtbtv/02-037/mp3
+
+獲取節目中的mp3文件列表(按照文件名倒序排列）
+http://amtbapi.hwadzan.com/amtbtv/02-037/mp3?order=desc 
+
+
+四、bg和card圖片地址
+http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/ 開頭
+
+例子
+http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/02-037_bg.jpg
+http://amtbsg.cloudapp.net/redirect/v/amtbtv/pic/02-037_card.jpg
+        
